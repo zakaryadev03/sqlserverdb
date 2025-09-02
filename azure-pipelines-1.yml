@@ -5,9 +5,9 @@
 
 resources:
   pipelines:
-    - pipeline: db_ci   
-      source: azure-pipelines   
-      trigger: true  
+  - pipeline: sqlserverdb 
+    source: zakaryadev03.sqlserverdb 
+    trigger: true
 
 pool:
   vmImage: 'windows-latest'
