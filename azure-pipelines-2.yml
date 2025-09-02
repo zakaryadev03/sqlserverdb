@@ -1,0 +1,53 @@
+trigger:
+  branches:
+    include:
+      - main
+
+stages:
+# -----------------------------
+# Stage 1: Build
+# -----------------------------
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+    - job: BuildJob
+      displayName: 'Build Solution'
+      pool:
+        vmImage: 'windows-latest'
+      steps:
+        - task: MSBuild@1
+          inputs:
+            solution: '**/*.sln'
+            msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)'
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'drop'
+            publishLocation: 'Container'
+
+# -----------------------------
+# Stage 2: Deploy
+# -----------------------------
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  jobs:
+    - job: DeployJob
+      displayName: 'Deploy DACPAC'
+      pool:
+        vmImage: 'windows-latest'
+      steps:
+        # Download the artifact from the Build stage
+        - download: current
+          artifact: drop
+
+        # Deploy the DACPAC
+        - task: SqlAzureDacpacDeployment@1
+          inputs:
+            azureSubscription: 'Azure for Students(8a625f6d-518c-4254-8e23-7c08e01e1d45)'
+            AuthenticationType: 'connectionString'
+            ConnectionString: '$(ConnectionString)'
+            deployType: 'DacpacTask'
+            DeploymentAction: 'Publish'
+            DacpacFile: '$(Pipeline.Workspace)/drop/SqlServerDatabase.dacpac'
+            IpDetectionMethod: 'AutoDetect'
