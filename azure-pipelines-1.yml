@@ -6,17 +6,20 @@
 resources:
   pipelines:
     - pipeline: db_ci   
-      source: db-ci-pipeline-name   
+      source: azure-pipelines   
       trigger: true  
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'windows-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: SqlAzureDacpacDeployment@1
+  inputs:
+    azureSubscription: 'Azure for Students(8a625f6d-518c-4254-8e23-7c08e01e1d45)'
+    AuthenticationType: 'connectionString'
+    ConnectionString: '$(ConnectionString)'
+    deployType: 'DacpacTask'
+    DeploymentAction: 'Publish'
+    DacpacFile: '$(Pipeline.Workspace)/drop/SqlServerDatabase.dacpac'
+    IpDetectionMethod: 'AutoDetect'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
