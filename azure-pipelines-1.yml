@@ -20,6 +20,6 @@ steps:
     ConnectionString: '$(ConnectionString)'
     deployType: 'DacpacTask'
     DeploymentAction: 'Publish'
-    DacpacFile: '$(Pipeline.Workspace)/drop/SqlServerDatabase.dacpac'
+    DacpacFile: '$(System.DefaultWorkingDirectory)/zakaryadev03.sqlserverdb/drop/SqlServerDatabase.dacpac'
     IpDetectionMethod: 'AutoDetect'
 
